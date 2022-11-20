@@ -23,36 +23,35 @@ module idecoder(input [15:0] ir, input [1:0] reg_sel,
   
   always_comb begin
         if (ir[4] == 1'b0) sximm5_reg = {11'b00000000000, ir[4:0]};
-        else sximm5_reg = {11'b1111111111, ir[4:0]};
+        else sximm5_reg = {11'b11111111111, ir[4:0]};
 
         if (ir[7] == 1'b0) sximm8_reg =  {8'b00000000, ir[7:0]};
         else sximm8_reg =  {8'b11111111, ir[7:0]};
   end
 
-
-  
-
-
   assign shift_op = shift_op_reg;
   assign shift_op_reg = ir[4:3];
-  
-  wire[2:0] rn = ir[10:8];
-  wire[2:0] rd = ir[7:5];
-  wire[2:0] rm = ir[2:0];
+
+  assign r_addr = r_addr_reg;
+  assign w_addr = w_addr_reg;
 
   always_comb begin
         case (reg_sel)
-        00: begin
-                r_addr_reg = rm;
-                w_addr_reg = rm;
+        2'b00: begin
+                r_addr_reg = ir[2:0];
+                w_addr_reg = ir[2:0];
         end
-        01: begin
-                r_addr_reg = rd;
-                w_addr_reg = rd;
+        2'b01: begin
+                r_addr_reg = ir[7:5];
+                w_addr_reg = ir[7:5];
         end
-        10: begin
-                r_addr_reg = rn;
-                w_addr_reg = rn;
+        2'b10: begin
+                r_addr_reg = ir[10:8];
+                w_addr_reg = ir[10:8];
+        end
+        default: begin
+                r_addr_reg = ir[2:0];
+                w_addr_reg = ir[2:0];
         end
         endcase
   end
