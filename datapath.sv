@@ -6,7 +6,7 @@ input [15:0] sximm8, input [15:0] sximm5,
                 output [15:0] datapath_out, output Z_out, output N_out, output V_out);
   // your implementation here
   wire [15:0] w_data, r_data, data_A, data_B, shift_out, val_A, val_B, ALU_out;
-  wire Z;
+  wire Z, N, V;
   
   regfile RF (w_data, w_addr, w_en, r_addr, clk, r_data);
   loadA LA (r_data, r_addr, clk, en_A, data_A);
@@ -16,7 +16,7 @@ input [15:0] sximm8, input [15:0] sximm5,
   selB SB (shift_out, sximm5, sel_B, val_B);
   ALU A (val_A, val_B, ALU_op, ALU_out, Z);
   enC C (ALU_out, en_C, datapath_out);
-  enS S (Z, en_status, Z_out);
+  enS S (Z, N, V, en_status, Z_out, N_out, V_out);
   write_back WB (wb_sel, datapath_out, mdata, sximm8, pc, w_data);
   
 endmodule: datapath
@@ -71,7 +71,7 @@ end
   end
 endmodule: selB
 
-module ALU(input [15:0] val_A, input [15:0] shift_out, input [1:0] ALU_op, output reg [15:0] ALU_out, output reg Z);
+module ALU(input [15:0] val_A, input [15:0] shift_out, input [1:0] ALU_op, output reg [15:0] ALU_out, output reg Z, output reg N, output reg V);
   always_comb begin
     case(ALU_op)
     2'b00: ALU_out = val_A + shift_out;
@@ -85,9 +85,21 @@ module ALU(input [15:0] val_A, input [15:0] shift_out, input [1:0] ALU_op, outpu
   always_comb begin
     if (ALU_out == 16'b0) begin
 Z = 1'b1;
+N = 1'b0;
+V = 1'b0;
+end else if (ALU_out < 16'b0) begin
+  Z = 1'b0;
+  N = 1'b1;
+V = 1'b0;
+end else if (ALU_out > 16'b1) begin
+  Z = 1'b0;
+N = 1'b0;
+  V = 1'b1;
 end else begin
   Z = 1'b0;
-end
+N = 1'b0;
+V = 1'b0;
+    end 
   end
 endmodule: ALU
 
@@ -101,12 +113,16 @@ end
   end
 endmodule: enC
 
-module enS (input Z, input en_status, output reg Z_out);
+module enS (input Z, input N, input V, input en_status, output reg Z_out, output reg N_out, output reg V_out);
   always_comb begin
 if (en_status) begin
 Z_out = Z;
+N_out = N;
+V_out = V;
 end else begin
   Z_out = 1'bx;
+N_out = 1'bx;;
+V_out = 1'bx;
 end
   end
 endmodule: enS
@@ -121,4 +137,3 @@ case(wb_sel)
 endcase
   end
 endmodule: write_back
-
