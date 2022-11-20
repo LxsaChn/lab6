@@ -33,7 +33,7 @@ module tb_idecoder(output err);
 
   task check_opcode(input[2:0] opcode_expect, input string msg);
     assert(opcode_test == opcode_expect) begin
-      $diplay("PASS %s: output is %b", msg, opcode_test);
+      $display("PASS %s: output is %b", msg, opcode_test);
       num_passes = num_passes + 1;
     end else begin
       $error("FAIL %s: output is %b, expected %b", msg, opcode_test, opcode_expect);
@@ -44,7 +44,7 @@ module tb_idecoder(output err);
 
   task check_ALU_op(input[1:0] ALU_expect, input string msg);
     assert(ALU_expect == ALU_op_test) begin
-      $diplay("PASS %s: output is %b", msg, ALU_op_test);
+      $display("PASS %s: output is %b", msg, ALU_op_test);
       num_passes = num_passes + 1;
     end else begin
       $error("FAIL %s: output is %b, expected %b", msg, ALU_op_test, ALU_expect);
@@ -55,7 +55,7 @@ module tb_idecoder(output err);
 
   task check_shift_op(input[1:0] shift_op_expect, input string msg);
     assert(shift_op_expect == shift_op_test) begin
-      $diplay("PASS %s: output is %b", msg, shift_op_test);
+      $display("PASS %s: output is %b", msg, shift_op_test);
       num_passes = num_passes + 1;
     end else begin
       $error("FAIL %s: output is %b, expected %b", msg, shift_op_test, shift_op_expect);
@@ -66,7 +66,7 @@ module tb_idecoder(output err);
 
   task check_sximm5(input[15:0] sximm5_expect, input string msg);
     assert(sximm5_test == sximm5_expect) begin
-      $diplay("PASS %s: output is %b", msg, sximm5_test);
+      $display("PASS %s: output is %b", msg, sximm5_test);
       num_passes = num_passes + 1;
     end else begin
       $error("FAIL %s: output is %b, expected %b", msg, sximm5_test, sximm5_expect);
@@ -77,7 +77,7 @@ module tb_idecoder(output err);
 
   task check_sximm8(input[15:0] sximm8_expect, input string msg);
     assert(sximm8_expect == sximm8_test) begin
-      $diplay("PASS %s: output is %b", msg, sximm8_test);
+      $display("PASS %s: output is %b", msg, sximm8_test);
       num_passes = num_passes + 1;
     end else begin
       $error("FAIL %s: output is %b, expected %b", msg, sximm8_test, sximm8_expect);
@@ -88,7 +88,7 @@ module tb_idecoder(output err);
 
   task check_r_addr(input[2:0] r_addr_expect, input string msg);
     assert(r_addr_expect == r_addr_test) begin
-      $diplay("PASS %s: output is %b", msg, r_addr_test);
+      $display("PASS %s: output is %b", msg, r_addr_test);
       num_passes = num_passes + 1;
     end else begin
       $error("FAIL %s: output is %b, expected %b", msg, r_addr_test, r_addr_expect);
@@ -99,7 +99,7 @@ module tb_idecoder(output err);
 
    task check_w_addr(input[2:0] w_addr_expect, input string msg);
     assert(w_addr_expect == w_addr_test) begin
-      $diplay("PASS %s: output is %b", msg, w_addr_test);
+      $display("PASS %s: output is %b", msg, w_addr_test);
       num_passes = num_passes + 1;
     end else begin
       $error("FAIL %s: output is %b, expected %b", msg, w_addr_test, w_addr_expect);
@@ -117,8 +117,26 @@ module tb_idecoder(output err);
     check_shift_op(2'b00, "TEST SHIFT OP NO SHIFT");
     check_sximm5(16'b0000000000000000, "TEST SXIM5");
     check_sximm8(16'b0000000000000000, "TEXT SXIM8");
+    check_r_addr(3'b000, "TEST R_ADDR SHOULD BE RM");
+    check_w_addr(3'b000, "TEST W_ADDR SHOULD BE RM");
 
-    
+    assign_values(16'b1100000011111010, 2'b01);
+    check_opcode(3'b110, "TEST OPCODE 1");
+    check_ALU_op(2'b00, "TEST ALU OP 2");
+    check_shift_op(2'b11, "TEST SHIFT OP ARITH RIGHT SHIFT");
+    check_sximm5(16'b1111111111111010, "TEST SXIM5");
+    check_sximm8(16'b1111111111111010, "TEXT SXIM8");
+    check_r_addr(3'b111, "TEST R_ADDR SHOULD BE RD");
+    check_w_addr(3'b111, "TEST W_ADDR SHOULD BE RD");
+
+    assign_values(16'b1010011100110000, 2'b10);
+    check_opcode(3'b101, "TEST OPCODE 1");
+    check_ALU_op(2'b00, "TEST ALU OP 1");
+    check_shift_op(2'b10, "TEST SHIFT OP RIGHT SHIFT");
+    check_sximm5(16'b1111111111110000, "TEST SXIM5");
+    check_sximm8(16'b0000000000110000, "TEXT SXIM8");
+    check_r_addr(3'b111, "TEST R_ADDR SHOULD BE RN");
+    check_w_addr(3'b111, "TEST W_ADDR SHOULD BE RN");
 
     $display("\n\n==== TEST SUMMARY ====");
     $display("  TEST COUNT: %-5d", num_passes + num_fails);
@@ -130,3 +148,4 @@ module tb_idecoder(output err);
 
 
 endmodule: tb_idecoder
+
