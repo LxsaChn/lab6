@@ -40,8 +40,8 @@ module controller(input clk, input rst_n, input start,
 
   always_comb begin
         if(curr == A) begin
-           if (start == 1'b1 && ALU_op == 2'b10 && opcode == 3'b110) next = F;
-        else if (start == 1'b1 && ALU_op == 2'b00 && opcode == 3'b110) next = C;
+           if (start == 1'b1 && ALU_op == 2'b00 && opcode == 3'b110) next = C;
+        else if (start == 1'b1 && ALU_op == 2'b10 && opcode == 3'b110) next = F;
         else if (start == 1'b1 || ALU_op == 2'b11) next = C;
         else if (start == 1'b1) next = B;
         else next = A;
@@ -65,14 +65,14 @@ module controller(input clk, input rst_n, input start,
         case(curr)
         A: begin
           waiting_reg = 1'b1;
-          reg_sel_reg = 2'bxx;
+          reg_sel_reg = 2'b00;
           en_A_reg = 1'b0;
           en_B_reg = 1'b0;
           en_C_reg = 1'b0;
           w_en_reg = 1'b0;
-          wb_sel_reg = 1'bx;
-          sel_A_reg = 1'bx;
-          sel_B_reg = 1'bx;
+          wb_sel_reg = 2'b00;
+          sel_A_reg = 1'b0;
+          sel_B_reg = 1'b0;
           en_status_reg = 1'b0;
         end
         B: begin
@@ -81,9 +81,9 @@ module controller(input clk, input rst_n, input start,
           en_A_reg = 1'b1;
           en_B_reg = 1'b0;
           w_en_reg = 1'b0;
-          wb_sel_reg = 2'bxx;
-          sel_A_reg = 1'bx;
-          sel_B_reg = 1'bx;
+          wb_sel_reg = 2'b00;
+          sel_A_reg = 1'b0;
+          sel_B_reg = 1'b0;
           en_C_reg = 1'b0;
           en_status_reg = 1'b0;
         end
@@ -94,17 +94,17 @@ module controller(input clk, input rst_n, input start,
           en_B_reg = 1'b1;
           en_C_reg = 1'b0;
           w_en_reg = 1'b0; 
-          wb_sel_reg = 2'bxx;
-          sel_A_reg = 1'bx;
-          sel_B_reg = 1'bx;
+          wb_sel_reg = 2'b00;
+          sel_A_reg = 1'b0;
+          sel_B_reg = 1'b0;
           en_status_reg = 1'b0;
         end
         D: if (opcode == 3'b110 && ALU_op == 2'b00) begin
           waiting_reg = 1'b0;
           en_A_reg = 1'b0;
           en_B_reg = 1'b0;
-          wb_sel_reg = 2'bxx;
-          reg_sel_reg = 1'bx;
+          wb_sel_reg = 2'b00;
+          reg_sel_reg = 1'b0;
           w_en_reg = 1'b0;
           sel_A_reg = 1'b1;
           sel_B_reg = 1'b0;
@@ -119,8 +119,8 @@ module controller(input clk, input rst_n, input start,
           sel_B_reg = 1'b0;
           en_C_reg = 1'b1;
           en_status_reg = 1'b0;
-          wb_sel_reg = 2'bxx;
-          reg_sel_reg = 2'bxx;
+          wb_sel_reg = 2'b00;
+          reg_sel_reg = 2'b00;
         end else if (ALU_op == 2'b01) begin
           waiting_reg = 1'b0;
           en_A_reg = 1'b0;
@@ -144,16 +144,16 @@ reg_sel_reg = 1'bx;
 wb_sel_reg = 1'bx;
 reg_sel_reg = 1'bx;
         end else begin
-   waiting_reg = 1'bx;
-   reg_sel_reg = 1'bx;
-   en_A_reg = 1'bx;
-   en_B_reg = 1'bx;
-   w_en_reg = 1'bx;
-  wb_sel_reg = 1'bx;
-   sel_A_reg = 1'bx;
-   sel_B_reg = 1'bx;
-   en_C_reg = 1'bx;
-   en_status_reg = 1'bx;
+   waiting_reg = 1'b0;
+   reg_sel_reg = 2'b00;
+   en_A_reg = 1'b0;
+   en_B_reg = 1'b0;
+   w_en_reg = 1'b0;
+  wb_sel_reg = 2'b00;
+   sel_A_reg = 1'b0;
+   sel_B_reg = 1'b0;
+   en_C_reg = 1'b0;
+   en_status_reg = 1'b0;
  end
         E: begin
           waiting_reg = 1'b0;
@@ -161,30 +161,30 @@ reg_sel_reg = 1'bx;
           en_B_reg = 1'b0;
           w_en_reg = 1'b0;
           en_status_reg = 1'b1;
-   reg_sel_reg = 1'bx;
-   wb_sel_reg = 1'bx;
+   reg_sel_reg = 1'b0;
+   wb_sel_reg = 1'b0;
    sel_A_reg = 1'b0;
    sel_B_reg = 1'b0;
-   en_C_reg = 1'bx;
+   en_C_reg = 1'b0;
         end
-        F: if (ALU_op == 2'b10 && opcode == 3'b110) begin
-          waiting_reg = 1'b0;
-          en_A_reg = 1'b0;
-          en_B_reg = 1'b0;
-          w_en_reg = 1'b1;
-          wb_sel_reg = 2'b10;
-          en_C_reg = 1'b0;
-          en_status_reg = 1'b0;
-          reg_sel_reg = 2'b10;
-          sel_A_reg = 1'bx;
-          sel_B_reg = 1'bx;
-        end else if (opcode == 3'b110 && ALU_op == 2'b00) begin
+        F: if ((opcode == 3'b110 && ALU_op == 2'b00) || (opcode == 3'b101 && ALU_op == 2'b11)) begin
           waiting_reg = 1'b0;
           en_A_reg = 1'b0;
           en_B_reg = 1'b0;
           w_en_reg = 1'b1;
           wb_sel_reg = 2'b00;
           reg_sel_reg = 2'b01;
+          en_C_reg = 1'b0;
+          en_status_reg = 1'b0;
+   sel_A_reg = 1'b1;
+   sel_B_reg = 1'b0;
+        end else if ((opcode == 3'b110 && ALU_op == 2'b10)) begin
+          waiting_reg = 1'b0;
+          en_A_reg = 1'b0;
+          en_B_reg = 1'b0;
+          w_en_reg = 1'b1;
+          wb_sel_reg = 2'b10;
+          reg_sel_reg = 2'b10;
           en_C_reg = 1'b0;
           en_status_reg = 1'b0;
    sel_A_reg = 1'b1;
