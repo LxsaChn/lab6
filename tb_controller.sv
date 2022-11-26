@@ -157,7 +157,7 @@ module tb_controller(output err);
     assign Z_test = Z;
     assign N_test = N;
     assign V_test = V;
-    #5;
+    #10;
   endtask
 
   initial begin
@@ -173,27 +173,90 @@ module tb_controller(output err);
     //Op 1 Test
     assign_stuff(3'b110, 2'b10, 2'b10, 1'b0, 1'b0, 1'b0);
     wait_status(1'b1, "IS WAITING AT START");
-    #10;
+    #15;
     start;
     wait_status(1'b0, "NOT WAITING");
-    check_enA(1'b0, "A NOT ON WHEN UPDATING");
-    check_enB(1'b0, "B NOT ON WHEN UPDATING");
-    check_enC(1'b0, "C NOT ON WHEN UPDATING");
-    check_w_en(1'b1, "W_EN ON CuZ UPDATING STATUS");
+    check_enA(1'b0, "A NOT ON WHEN NOTUPDATING");
+    check_enB(1'b0, "B NOT ON WHENNOT UPDATING");
+    check_enC(1'b0, "C NOT ON WHEN NOTUPDATING");
+    check_w_en(1'b1, "W_EN ON CuZ UPDATING REG");
     check_wb_sel(2'b10, "WB_SEL SAYS COMING FROM SXIMM8");
 
     //Op 2 test
     #10;
-    wait_status(1'b1, "IS WAITING AT START");
+    wait_status(1'b1, "IS WAITING AT START OF OP 2 TEST");
 
     assign_stuff(3'b110, 2'b00, 2'b10, 1'b0, 1'b0, 1'b0);
     #10;
     start;
     wait_status(1'b0, "NOT WAITING");
+    check_reg_sel(2'b00, "R SELECTED IS RM");
     check_enA(1'b0, "A NOT ON WHEN NOT UPDATING");
     check_enB(1'b1, "B ON WHEN UPDATING");
-    check_enC(1'b0, "C NOT ON WHEN UPDATING");
+    check_enC(1'b0, "C NOT ON WHENNOT UPDATING");
     check_w_en(1'b0, "W_EN OFF");
+
+    #10
+    wait_status(1'b0, "NOT WAITING");
+    check_enA(1'b0, "A NOT ON WHEN NOT UPDATING");
+    check_enB(1'b0, "B NOT ON WHEN NOT UPDATING");
+    check_enC(1'b1, "C ON WHEN UPDATING");
+    check_w_en(1'b0, "W_EN OFF");
+    check_selA(1'b1, "SELECTED ALL 0S FOR A");
+    check_selB(1'b0, "SELECTED SHIFTED INPUT VALUE FOR B");
+
+    #10;
+    wait_status(1'b0, "NOT WAITING");
+    check_enA(1'b0, "A NOT ON WHEN NOTUPDATING");
+    check_enB(1'b0, "B NOT ON WHEN NOTUPDATING");
+    check_enC(1'b0, "C NOT ON WHEN NOTUPDATING");
+    check_w_en(1'b1, "W_EN ON CuZ UPDATING STATUS");
+    check_wb_sel(2'b00, "WB_SEL SAYS COMING FROM C");
+
+     //Op 3 test
+    #10;
+    wait_status(1'b1, "IS WAITING AT START OF OP3 TEST");
+
+    assign_stuff(3'b101, 2'b00, 2'b01, 1'b0, 1'b0, 1'b0);
+    #10;
+    start;
+    wait_status(1'b0, "NOT WAITING");
+    check_reg_sel(2'b10, "R SELECTED IS RN");
+    check_enA(1'b1, "A  ON WHEN  UPDATING");
+    check_enB(1'b0, "B NOTON WHEN NOTUPDATING");
+    check_enC(1'b0, "C NOT ON WHEN NOTUPDATING");
+    check_w_en(1'b0, "W_EN OFF");
+
+    #10;
+    wait_status(1'b0, "NOT WAITING");
+    check_reg_sel(2'b00, "R SELECTED IS RM");
+    check_enA(1'b0, "A  NOTON WHEN NOT UPDATING");
+    check_enB(1'b1, "B NOT WHEN UPDATING");
+    check_enC(1'b0, "C NOT ON WHEN NOTUPDATING");
+    check_w_en(1'b0, "W_EN OFF");
+
+    #10
+    wait_status(1'b0, "NOT WAITING");
+    check_enA(1'b0, "A NOT ON WHEN NOT UPDATING");
+    check_enB(1'b0, "B NOT ON WHEN NOT UPDATING");
+    check_enC(1'b1, "C ON WHEN UPDATING");
+    check_w_en(1'b0, "W_EN OFF");
+    check_selA(1'b0, "SELECTED A INPUT VALUE");
+    check_selB(1'b0, "SELECTED SHIFTED INPUT VALUE FOR B");
+
+    #10;
+    wait_status(1'b0, "NOT WAITING");
+    check_enA(1'b0, "A NOT ON WHEN NOTUPDATING");
+    check_enB(1'b0, "B NOT ON WHEN NOTUPDATING");
+    check_enC(1'b0, "C NOT ON WHEN NOTUPDATING");
+    check_w_en(1'b0, "W_EN OFF NOT sUPDATING STATUS");
+    check_wb_sel(2'b00, "WB_SEL SAYS COMING FROM C");
+
+
+
+
+
+
 
 
 
